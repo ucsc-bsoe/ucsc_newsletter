@@ -1,0 +1,90 @@
+<?php
+
+use Drupal\Core\Render\Markup;
+
+function ucsc_newsletter_cron() {
+  require_once("ucsc_newsletter_send.php");
+	ucsc_newsletter_send();
+}
+
+/**
+* Implements hook_mail(). Notes on configuration of mail. Must use Swift Mailer.
+ * Set '/admin/config/system/mailsystem' to Formatter: Swift Mailer, Sender:
+ * Swift Mailer, Theme: BSOE Plain.
+ * Set 'admin/config/swiftmailer/transport' - Transport tab: Transport Types: PHP
+ * Messages tab: Message Format: HTML, Plain Text Version: Yes (Generate checked),
+ * Character set: UTF-8
+*/
+
+function ucsc_newsletter_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'newsletter_create_submission':
+      $message['subject'] = t('BSOE Newsletter Submission: @title',
+        array('@title' => $params['node_title'])) . " created on: " . date("m-d-Y h:i");
+      $message['body'][] = $params['body'];
+      break;
+
+    case 'newsletter_weekly':
+      $message['subject'] = 'BSOE Undergraduate Newsletter for ' . date("m/d/Y");
+      $message['body'][] = $params['message'];
+     break;
+ }
+}
+
+/**
+* Implements hook_entity_insert().
+*/
+function ucsc_newsletter_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
+
+  // Restrict to entities that need a notification
+  if ($entity->bundle() === 'newsletter_announcement'
+    || $entity->bundle() === 'newsletter_event'
+    || $entity->bundle() === 'newsletter_job') {
+
+    $mailManager = \Drupal::service('plugin.manager.mail');
+    $module = 'ucsc_newsletter';
+    $key = 'newsletter_create_submission';
+    $to = \Drupal::config('ucsc_newsletter.settings')->get('notification_address');
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+
+    // Creating the params for this message.
+    // Get information from this entity.
+    $params['node_title'] = $entity->label();
+
+    // Use those to create the message. We add inline styles so that it shows up
+    // in the email.
+    $body = Markup::create($entity->get('body')->value);
+    if ($entity->bundle() === 'newsletter_event') {
+      $extras = $entity->get('field_event_date_time')->value;
+      $extras = "<strong>Date and Time: </strong>" . date('l, m/d/Y g:i a', $extras);
+      $extras2 = Markup::create($entity->get('field_event_location')->value);
+      $extras2 = "<strong>Location:</strong> " . $extras2;
+    } else if ($entity->bundle() === 'newsletter_job') {
+	    $job_url = $entity->get('field_job_link')->uri;
+	    $job_url_title = $entity->field_job_link->title;
+	    $extras = "<p><a href='" . $job_url . "'>" . $job_url_title . "</a></p>";
+    } else {
+	    $extras = " ";
+    }
+
+    $link = $entity->toUrl()->toString();
+    $body = "<h1 style='color:#0c5eb1;'>" . $params['node_title'] . "</h1> <div 
+	 >" . $body . "</div> <div>" . $extras . "<br>" . $extras2 . "</div>
+     <div><a href='https://undergrad.soe.ucsc.edu" . $link . "'>Publish or modify this newsletter submission.</a></div>";
+    $params['body'] = Markup::create($body);
+
+    $from = \Drupal::config('ucsc_newsletter.settings')->get('from_address');
+    $send = true;
+    $result = $mailManager->mail($module, $key, $to, $langcode, $params, $from, $send);
+
+    // Notify of the result.
+    if ($result['result'] !== true) {
+      drupal_set_message(t('There was a problem sending your message and it was not sent.'), 'error');
+    }
+    else {
+      drupal_set_message(t('Your message has been sent.'));
+    }
+  } else {
+    return;
+  }
+}

@@ -1,0 +1,8 @@
+name: UCSC Newsletter 
+type: module
+description: Newsletter for undergrad site.
+core: 8.x
+version: 0.1
+package: UCSC
+dependancies:
+  - swiftmailer

@@ -1,0 +1,4 @@
+#services:
+#  plugin.manager.ucscnewslettermail:
+#    class: Drupal\ucsc_newsletter\Plugin\UCSCNewsletterHTMLMail
+#    parent: default_plugin_manager

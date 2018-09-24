@@ -1,0 +1,14 @@
+ucsc_newsletter.settings:
+  path: '/admin/ucsc-newsletter/settings'
+  defaults:
+    _form: '\Drupal\ucsc_newsletter\Form\UCSCNewsletterSettingsForm'
+    _title: 'UCSC Newsletter Settings'
+  requirements:
+    _permission: 'administer site configuration'
+ucsc_newsletter.testing-page:
+  path: '/admin/content-page'
+  defaults:
+    _controller: '\Drupal\ucsc_newsletter\Controller\UCSCNewsletterContentController::make_newsletter'
+    _title: 'UCSC Newsletter Content Page'
+  requirements:
+    _permission: 'administer site configuration'
