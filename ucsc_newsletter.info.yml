@@ -4,5 +4,6 @@ description: Newsletter for undergrad site.
 core: 8.x
 version: 0.1
 package: UCSC
+configure: ucsc_newsletter.settings 
 dependancies:
   - swiftmailer

@@ -17,7 +17,10 @@ function ucsc_newsletter_cron() {
 */
 
 function ucsc_newsletter_mail($key, &$message, $params) {
-  switch ($key) {
+  $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';	
+  //$message->setEncoder(Swift_Encoding::get8BitEncoding());
+  //$message->setBody($body, "text/html");      
+    switch ($key) {
     case 'newsletter_create_submission':
       $message['subject'] = t('BSOE Newsletter Submission: @title',
         array('@title' => $params['node_title'])) . " created on: " . date("m-d-Y h:i");
@@ -60,11 +63,13 @@ function ucsc_newsletter_entity_insert(Drupal\Core\Entity\EntityInterface $entit
       $extras2 = Markup::create($entity->get('field_event_location')->value);
       $extras2 = "<strong>Location:</strong> " . $extras2;
     } else if ($entity->bundle() === 'newsletter_job') {
-	    $job_url = $entity->get('field_job_link')->uri;
-	    $job_url_title = $entity->field_job_link->title;
-	    $extras = "<p><a href='" . $job_url . "'>" . $job_url_title . "</a></p>";
+      $job_url = $entity->get('field_job_link')->uri;
+      $job_url_title = $entity->field_job_link->title;
+      $extras = "<p><a href='" . $job_url . "'>" . $job_url_title . "</a></p>";
+      $extras2 = "";
     } else {
-	    $extras = " ";
+      $extras = " ";
+      $extras2 = "";
     }
 
     $link = $entity->toUrl()->toString();
@@ -87,4 +92,14 @@ function ucsc_newsletter_entity_insert(Drupal\Core\Entity\EntityInterface $entit
   } else {
     return;
   }
+}
+
+/**
+ * Implements hook_preprocess_swiftmailer().
+ */
+function ucsc_newsletter_preprocess_swiftmailer(&$variables) {
+  global $base_path;
+  $pattern = '/(src|href)=(\'|")' . preg_quote($base_path, '/') . '/';
+  $replacement = '$1=$2' . \Drupal\Core\Url::fromRoute('<front>', array(), array('absolute' => TRUE))->toString();
+  $variables['body'] = \Drupal\Core\Render\Markup::create(preg_replace($pattern, $replacement, $variables['body']));
 }

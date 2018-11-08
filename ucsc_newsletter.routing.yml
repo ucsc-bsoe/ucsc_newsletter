@@ -1,5 +1,5 @@
 ucsc_newsletter.settings:
-  path: '/admin/ucsc-newsletter/settings'
+  path: '/admin/structure/ucsc-newsletter'
   defaults:
     _form: '\Drupal\ucsc_newsletter\Form\UCSCNewsletterSettingsForm'
     _title: 'UCSC Newsletter Settings'

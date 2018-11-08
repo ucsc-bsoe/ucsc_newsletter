@@ -35,7 +35,7 @@ class UCSCNewsletterContentController extends ControllerBase {
       "<div class='newsletter-item'>" .
       $announcements_new . $announcements_toc . $events_toc . $jobs_toc .
       "</div>" .
-      $announcements_list . $events_list . $jobs_list . "</div>";
+     $announcements_list . $events_list . $jobs_list . "</div>";
 
     return $total_message;
   }
@@ -60,7 +60,7 @@ class UCSCNewsletterContentController extends ControllerBase {
 	$end_date = strtotime($node->get('field_end_date')->value);
 	$start_date = strtotime($node->get('field_start_date')->value);
         $current_date = strtotime(date("Y-m-d"));
-	if ($end_date > $current_date && $start_date < $current_date) {
+	if (($end_date + 86400) > $current_date && ($start_date - 86400) < $current_date) {
           $message = $message .
           "<h3><a name='announce-" . $node->get('nid')->value . "' href='https://undergrad.soe.ucsc.edu" . $node->toUrl('canonical')
           ->toString() . "'>"
@@ -101,8 +101,8 @@ class UCSCNewsletterContentController extends ControllerBase {
 	$end_date = strtotime($node->get('field_end_date')->value);
 	$start_date = strtotime($node->get('field_start_date')->value);
         $current_date = strtotime(date("Y-m-d"));
-	if ($end_date > $current_date && $start_date < $current_date) {
-        $message = $message .
+	if (($end_date + 86400) > $current_date && ($start_date - 86400) < $current_date) {
+	$message = $message .
           "<h3><a name='event-" . $node->get('nid')->value . "' href='https://undergrad.soe.ucsc.edu" . $node->toUrl('canonical')
           ->toString() . "'>"
           . $node->get('title')->value . "</a></h3>" .
@@ -136,8 +136,8 @@ class UCSCNewsletterContentController extends ControllerBase {
 	$end_date = strtotime($node->get('field_end_date')->value);
 	$start_date = strtotime($node->get('field_start_date')->value);
         $current_date = strtotime(date("Y-m-d"));
-	if ($end_date > $current_date && $start_date < $current_date) {
-        $message = $message .
+	if (($end_date + 86400) > $current_date && ($start_date - 86400) < $current_date) {
+	$message = $message .
           "<h3><a name='job-" . $node->get('nid')->value . "' href='https://undergrad.soe.ucsc.edu" . $node->toUrl('canonical')
           ->toString() . "'>"
           . $node->get('title')->value . "</a></h3>" .

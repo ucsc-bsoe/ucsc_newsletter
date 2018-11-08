@@ -7,7 +7,7 @@ use Drupal\node\Entity\Node;
 function ucsc_newsletter_send() {
 
   // Get information from ucsc_newsletter settings configuration to use here.
-	$config = \Drupal::config('ucsc_newsletter.settings');
+  $config = \Drupal::config('ucsc_newsletter.settings');
 
   $last_sent_date = $config->get("last_sent_date");
   $weekday = $config->get("weekday");
@@ -60,4 +60,18 @@ function ucsc_newsletter_send() {
     drupal_set_message( "Node with nid " . $node->id() . " saved!\n");
 
   }
+
+  /*if (1 === 1) {
+
+    // Settings to send the mail to ucsc_newsletter_mail in ucsc_newsletter.module.
+    $mailManager = \Drupal::service('plugin.manager.mail');
+    $module = 'ucsc_newsletter';
+    $key = 'newsletter_weekly';
+    $to = 'kbradham@ucsc.edu';
+    $params['message'] = Markup::create($newsletter_content);
+    $from = 'kbradham@ucsc.edu';
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    $send = true;
+    $mailManager->mail($module, $key, $to, $langcode, $params, $from, $send);
+  } */  
 }
